@@ -41,9 +41,6 @@
             border: none;
             color: white;
             padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
             font-size: 16px;
             margin-top: 20px;
             cursor: pointer;
@@ -60,64 +57,90 @@
 </head>
 <body>
 
-    <!-- A betöltőképernyő a gombbal. -->
+    <!-- Betöltő képernyő -->
     <div id="arjs-loader" class="arjs-loader">
         <div>Kérem, várjon...</div>
-        <p>A böngésző a kamera használatához felhasználói engedélyre vár. Kérem, kattintson az "Indítás" gombra!</p>
+        <p>A böngésző a kamera használatához felhasználói engedélyre vár.<br>
+        Kattintson az "Indítás" gombra!</p>
         <button id="startButton">Indítás</button>
         <div id="error-message" class="error-message" style="display: none;"></div>
     </div>
+
+    <!-- AR jelenet -->
+    <a-scene
+        id="ar-scene"
+        embedded
+        arjs="sourceType: webcam; debugUIEnabled: false;">
+
+        <!-- Marker -->
+        <a-marker type="pattern" url="https://kissarret-code.github.io/minta-111111111111111111111.patt">
+
+            <!-- Videó (autoplay, muted, playsinline fontos!) -->
+            <a-video
+                id="ar-video"
+                src="#video1"
+                width="2"
+                height="1.5"
+                position="0 0 0"
+                rotation="-90 0 0"
+                loop="true"
+                autoplay="true"
+                muted="true"
+                playsinline>
+            </a-video>
+
+        </a-marker>
+
+        <!-- Kamera -->
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <!-- A tényleges HTML5 <video> elem -->
+    <video
+        id="video1"
+        src="https://kissarret-code.github.io/trendihangeffektusok.mp4"
+        preload="auto"
+        loop
+        muted
+        playsinline
+        webkit-playsinline
+        crossorigin="anonymous"
+        style="display: none;">
+    </video>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const startButton = document.getElementById('startButton');
             const loader = document.getElementById('arjs-loader');
-            const errorMessage = document.getElementById('error-message');
+            const videoEl = document.getElementById('video1');
 
-            startButton.addEventListener('click', async () => {
-                try {
-                    // Közvetlenül kérjük a kamera engedélyét
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                    
-                    // Ha a stream sikeres, dinamikusan létrehozzuk az a-scene elemet
-                    const arScene = document.createElement('a-scene');
-                    arScene.setAttribute('id', 'ar-scene');
-                    arScene.setAttribute('embedded', '');
-                    arScene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false;');
-                    
-                    // Létrehozzuk és hozzáadjuk a markert és a videót
-                    const marker = document.createElement('a-marker');
-                    marker.setAttribute('type', 'pattern');
-                    marker.setAttribute('url', 'https://kissarret-code.github.io/minta-111111111111111111111.patt');
+            startButton.addEventListener('click', () => {
+                loader.classList.add('hidden');
 
-                    const arVideo = document.createElement('a-video');
-                    arVideo.setAttribute('id', 'ar-video');
-                    arVideo.setAttribute('src', 'https://kissarret-code.github.io/trendihangeffektusok.mp4');
-                    arVideo.setAttribute('width', '2');
-                    arVideo.setAttribute('height', '1.5');
-                    arVideo.setAttribute('position', '0 0 0');
-                    arVideo.setAttribute('rotation', '-90 0 0');
-                    arVideo.setAttribute('loop', 'true');
-
-                    marker.appendChild(arVideo);
-                    arScene.appendChild(marker);
-
-                    // Hozzáadjuk a kamerát az AR jelenethez
-                    const cameraEntity = document.createElement('a-entity');
-                    cameraEntity.setAttribute('camera', '');
-                    arScene.appendChild(cameraEntity);
-
-                    // Hozzáadjuk a body-hoz az elkészült jelenetet és eltüntetjük a betöltőképernyőt
-                    document.body.appendChild(arScene);
-                    loader.classList.add('hidden');
-
-                } catch (error) {
-                    console.error('Hiba a kamera indításakor:', error);
-                    errorMessage.textContent = 'Hiba történt a kamera indításakor. Kérjük, engedélyezze a kamera használatát.';
-                    errorMessage.style.display = 'block';
-                }
+                // Videó elindítása felhasználói interakcióra
+                videoEl.play().catch(err => {
+                    console.error("Videó indítási hiba:", err);
+                    document.getElementById('error-message').style.display = "block";
+                    document.getElementById('error-message').innerText =
+                        "A videót nem sikerült elindítani: " + err.message;
+                });
             });
         });
     </script>
 </body>
 </html>
+
+Mi változott?
+
+    A <a-video> most nem közvetlenül az MP4-re mutat, hanem egy rejtett <video> DOM elemre (src="#video1").
+    → Ez a helyes módszer A-Frame-ben, mert így tudod JavaScripttel irányítani a lejátszást.
+
+    Hozzáadtam:
+
+        autoplay, muted, playsinline attribútumokat.
+
+        A rejtett <video>-t (id="video1") a body-ba.
+
+    A Start gomb eseménykezelője most ténylegesen meghívja a videoEl.play()-t → így a böngésző engedi elindítani.
+
+Szeretnéd, hogy ezt a példát úgy alakítsam át, hogy a videónak legyen hangja is (nem némítva), vagy maradjon így némítva az autoplay miatt?
