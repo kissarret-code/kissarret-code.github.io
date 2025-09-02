@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Videó Lejátszó</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-ar@3.4.0/aframe-ar.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: sans-serif; }
+        .arjs-loader {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .arjs-loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .arjs-loader div {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .arjs-loader p {
+            font-size: 1rem;
+            color: #ccc;
+        }
+        .arjs-loader button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .error-message {
+            color: #ff4d4d;
+            font-size: 1rem;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- A betöltőképernyő a gombbal. -->
+    <div id="arjs-loader" class="arjs-loader">
+        <div>Kérem, várjon...</div>
+        <p>A böngésző a kamera használatához felhasználói engedélyre vár. Kérem, kattintson az "Indítás" gombra!</p>
+        <button id="startButton">Indítás</button>
+        <div id="error-message" class="error-message" style="display: none;"></div>
+    </div>
+
+    <!-- A rejtett videó elem, amire a kamera képe kerül. -->
+    <video id="camera-stream" playsinline style="display: none;"></video>
+
+    <!-- Az AR jelenet. Kezdetben rejtett. -->
+    <a-scene
+        id="ar-scene"
+        embedded
+        arjs="sourceType: webcam; debugUIEnabled: false;"
+        style="display: none;">
+
+        <!-- Ez az a marker, amit a kamera keresni fog. -->
+        <a-marker type="pattern" url="https://kissarret-code.github.io/minta-111111111111111111111.patt">
+
+            <!-- Ez az a videó, ami a markerre fog vetülni. -->
+            <a-video
+                id="ar-video"
+                src="https://kissarret-code.github.io/trendihangeffektusok.mp4"
+                width="2"
+                height="1.5"
+                position="0 0 0"
+                rotation="-90 0 0"
+                loop="true">
+            </a-video>
+
+        </a-marker>
+
+        <!-- A kamera, amely a kameraképet jeleníti meg. -->
+        <a-entity camera></a-entity>
+
+    </a-scene>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const startButton = document.getElementById('startButton');
+            const loader = document.getElementById('arjs-loader');
+            const arScene = document.getElementById('ar-scene');
+
+            startButton.addEventListener('click', () => {
+                // Eltüntetjük a betöltő képernyőt.
+                loader.classList.add('hidden');
+                
+                // Kisebb késleltetéssel jelenítjük meg az AR jelenetet, ami elindítja a kamerafolyamot.
+                setTimeout(() => {
+                    arScene.style.display = 'block';
+                }, 500); // 500 ms (fél másodperc) késleltetés
+            });
+        });
+    </script>
+</body>
+</html>
