@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AR Videó Lejátszó</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://unpkg.com/aframe-ar@3.4.0/aframe-ar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.0/aframe/build/aframe-ar.min.js"></script>
     <style>
         body { margin: 0; overflow: hidden; font-family: sans-serif; }
         .arjs-loader {
@@ -68,9 +68,6 @@
         <div id="error-message" class="error-message" style="display: none;"></div>
     </div>
 
-    <!-- A rejtett videó elem, amire a kamera képe kerül. -->
-    <video id="camera-stream" playsinline style="display: none;"></video>
-
     <!-- Az AR jelenet. Kezdetben rejtett. -->
     <a-scene
         id="ar-scene"
@@ -106,15 +103,11 @@
             const arScene = document.getElementById('ar-scene');
 
             startButton.addEventListener('click', () => {
-                // Eltüntetjük a betöltő képernyőt.
                 loader.classList.add('hidden');
-                
-                // Kisebb késleltetéssel jelenítjük meg az AR jelenetet, ami elindítja a kamerafolyamot.
-                setTimeout(() => {
-                    arScene.style.display = 'block';
-                }, 500); // 500 ms (fél másodperc) késleltetés
+                arScene.style.display = 'block';
             });
         });
     </script>
 </body>
 </html>
+
