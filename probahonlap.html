@@ -1,146 +1,28 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Videó Lejátszó</title>
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.0/aframe/build/aframe-ar.min.js"></script>
-    <style>
-        body { margin: 0; overflow: hidden; font-family: sans-serif; }
-        .arjs-loader {
-            height: 100%;
-            width: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            color: white;
-            transition: opacity 0.5s ease-in-out;
-        }
-        .arjs-loader.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        .arjs-loader div {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        .arjs-loader p {
-            font-size: 1rem;
-            color: #ccc;
-        }
-        .arjs-loader button {
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            padding: 15px 32px;
-            font-size: 16px;
-            margin-top: 20px;
-            cursor: pointer;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .error-message {
-            color: #ff4d4d;
-            font-size: 1rem;
-            margin-top: 20px;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>AR Élő Kép Teszt</title>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.0/aframe/build/aframe-ar.min.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; }
+  </style>
 </head>
 <body>
-
-    <!-- Betöltő képernyő -->
-    <div id="arjs-loader" class="arjs-loader">
-        <div>Kérem, várjon...</div>
-        <p>A böngésző a kamera használatához felhasználói engedélyre vár.<br>
-        Kattintson az "Indítás" gombra!</p>
-        <button id="startButton">Indítás</button>
-        <div id="error-message" class="error-message" style="display: none;"></div>
-    </div>
-
-    <!-- AR jelenet -->
-    <a-scene
-        id="ar-scene"
-        embedded
-        arjs="sourceType: webcam; debugUIEnabled: false;">
-
-        <!-- Marker -->
-        <a-marker type="pattern" url="https://kissarret-code.github.io/minta-111111111111111111111.patt">
-
-            <!-- Videó (autoplay, muted, playsinline fontos!) -->
-            <a-video
-                id="ar-video"
-                src="#video1"
-                width="2"
-                height="1.5"
-                position="0 0 0"
-                rotation="-90 0 0"
-                loop="true"
-                autoplay="true"
-                muted="true"
-                playsinline>
-            </a-video>
-
-        </a-marker>
-
-        <!-- Kamera -->
-        <a-entity camera></a-entity>
-    </a-scene>
-
-    <!-- A tényleges HTML5 <video> elem -->
-    <video
-        id="video1"
-        src="https://kissarret-code.github.io/trendihangeffektusok.mp4"
-        preload="auto"
-        loop
-        muted
-        playsinline
-        webkit-playsinline
-        crossorigin="anonymous"
-        style="display: none;">
-    </video>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const startButton = document.getElementById('startButton');
-            const loader = document.getElementById('arjs-loader');
-            const videoEl = document.getElementById('video1');
-
-            startButton.addEventListener('click', () => {
-                loader.classList.add('hidden');
-
-                // Videó elindítása felhasználói interakcióra
-                videoEl.play().catch(err => {
-                    console.error("Videó indítási hiba:", err);
-                    document.getElementById('error-message').style.display = "block";
-                    document.getElementById('error-message').innerText =
-                        "A videót nem sikerült elindítani: " + err.message;
-                });
-            });
-        });
-    </script>
+  <a-scene
+    embedded
+    vr-mode-ui="enabled: false"
+    renderer="logarithmicDepthBuffer: true;"
+    arjs="sourceType: webcam; debugUIEnabled: false;">
+    
+    <!-- Marker (HIRO a legegyszerűbb és biztosan működik) -->
+    <a-marker type="pattern" url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/patt.hiro">
+      <a-box position="0 0.5 0" material="color: red;"></a-box>
+    </a-marker>
+    
+    <!-- Kamera -->
+    <a-entity camera></a-entity>
+  </a-scene>
 </body>
 </html>
-
-Mi változott?
-
-    A <a-video> most nem közvetlenül az MP4-re mutat, hanem egy rejtett <video> DOM elemre (src="#video1").
-    → Ez a helyes módszer A-Frame-ben, mert így tudod JavaScripttel irányítani a lejátszást.
-
-    Hozzáadtam:
-
-        autoplay, muted, playsinline attribútumokat.
-
-        A rejtett <video>-t (id="video1") a body-ba.
-
-    A Start gomb eseménykezelője most ténylegesen meghívja a videoEl.play()-t → így a böngésző engedi elindítani.
-
-Szeretnéd, hogy ezt a példát úgy alakítsam át, hogy a videónak legyen hangja is (nem némítva), vagy maradjon így némítva az autoplay miatt?
