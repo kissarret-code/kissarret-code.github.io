@@ -68,46 +68,56 @@
         <div id="error-message" class="error-message" style="display: none;"></div>
     </div>
 
-    <!-- Az AR jelenet. Kezdetben rejtett. -->
-    <a-scene
-        id="ar-scene"
-        embedded
-        arjs="sourceType: webcam; debugUIEnabled: false;"
-        style="display: none;">
-
-        <!-- Ez az a marker, amit a kamera keresni fog. -->
-        <a-marker type="pattern" url="https://kissarret-code.github.io/minta-111111111111111111111.patt">
-
-            <!-- Ez az a videó, ami a markerre fog vetülni. -->
-            <a-video
-                id="ar-video"
-                src="https://kissarret-code.github.io/trendihangeffektusok.mp4"
-                width="2"
-                height="1.5"
-                position="0 0 0"
-                rotation="-90 0 0"
-                loop="true">
-            </a-video>
-
-        </a-marker>
-
-        <!-- A kamera, amely a kameraképet jeleníti meg. -->
-        <a-entity camera></a-entity>
-
-    </a-scene>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const startButton = document.getElementById('startButton');
             const loader = document.getElementById('arjs-loader');
-            const arScene = document.getElementById('ar-scene');
+            const errorMessage = document.getElementById('error-message');
 
-            startButton.addEventListener('click', () => {
-                loader.classList.add('hidden');
-                arScene.style.display = 'block';
+            startButton.addEventListener('click', async () => {
+                try {
+                    // Közvetlenül kérjük a kamera engedélyét
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    
+                    // Ha a stream sikeres, dinamikusan létrehozzuk az a-scene elemet
+                    const arScene = document.createElement('a-scene');
+                    arScene.setAttribute('id', 'ar-scene');
+                    arScene.setAttribute('embedded', '');
+                    arScene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false;');
+                    
+                    // Létrehozzuk és hozzáadjuk a markert és a videót
+                    const marker = document.createElement('a-marker');
+                    marker.setAttribute('type', 'pattern');
+                    marker.setAttribute('url', 'https://kissarret-code.github.io/minta-111111111111111111111.patt');
+
+                    const arVideo = document.createElement('a-video');
+                    arVideo.setAttribute('id', 'ar-video');
+                    arVideo.setAttribute('src', 'https://kissarret-code.github.io/trendihangeffektusok.mp4');
+                    arVideo.setAttribute('width', '2');
+                    arVideo.setAttribute('height', '1.5');
+                    arVideo.setAttribute('position', '0 0 0');
+                    arVideo.setAttribute('rotation', '-90 0 0');
+                    arVideo.setAttribute('loop', 'true');
+
+                    marker.appendChild(arVideo);
+                    arScene.appendChild(marker);
+
+                    // Hozzáadjuk a kamerát az AR jelenethez
+                    const cameraEntity = document.createElement('a-entity');
+                    cameraEntity.setAttribute('camera', '');
+                    arScene.appendChild(cameraEntity);
+
+                    // Hozzáadjuk a body-hoz az elkészült jelenetet és eltüntetjük a betöltőképernyőt
+                    document.body.appendChild(arScene);
+                    loader.classList.add('hidden');
+
+                } catch (error) {
+                    console.error('Hiba a kamera indításakor:', error);
+                    errorMessage.textContent = 'Hiba történt a kamera indításakor. Kérjük, engedélyezze a kamera használatát.';
+                    errorMessage.style.display = 'block';
+                }
             });
         });
     </script>
 </body>
 </html>
-
